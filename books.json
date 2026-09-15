@@ -1,0 +1,18 @@
+[
+  {
+    "isbn": "885415125421",
+    "title": "Node.js",
+    "author": "Suvimol Mukviboonchai",
+    "year": "2027",
+    "publisher": "NPRU Press",
+    "status": "available"
+  },
+  {
+    "isbn": "ุุ664245049",
+    "title": "acw",
+    "author": "Surasit Srisom",
+    "year": "2026",
+    "publisher": "CS",
+    "status": "available"
+  }
+]

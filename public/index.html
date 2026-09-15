@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการห้องสมุด (Library System)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0f172a;
+            color: #ffffff;
+            padding: 30px;
+        }
+        h1, h2 {
+            color: #f59e0b;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #1e293b;
+        }
+        th, td {
+            border: 1px solid #334155;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #0284c7;
+            color: white;
+        }
+        .status-available {
+            color: #4ade80;
+            font-weight: bold;
+        }
+        .form-container {
+            background-color: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            color: #fff;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #eab308;
+            color: #000;
+            font-weight: bold;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #ca8a04;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ระบบห้องสมุด - Library System</h1>
+
+    <div class="form-container">
+        <h2>ฟอร์มกรอกข้อมูลหนังสือ</h2>
+        <form id="addBookForm">
+            <div class="form-group">
+                <label>ISBN:</label>
+                <input type="text" id="isbn" required>
+            </div>
+            <div class="form-group">
+                <label>ชื่อหนังสือ:</label>
+                <input type="text" id="title" required>
+            </div>
+            <div class="form-group">
+                <label>ผู้แต่ง:</label>
+                <input type="text" id="author" required>
+            </div>
+            <div class="form-group">
+                <label>ปีที่พิมพ์:</label>
+                <input type="text" id="year" required>
+            </div>
+            <div class="form-group">
+                <label>สำนักพิมพ์:</label>
+                <input type="text" id="publisher" required>
+            </div>
+            <button type="submit">POST TO: /api/book</button>
+        </form>
+    </div>
+
+    <h2>รายการหนังสือในห้องสมุด</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ISBN</th>
+                <th>ชื่อหนังสือ</th>
+                <th>ผู้แต่ง</th>
+                <th>ปี</th>
+                <th>สำนักพิมพ์</th>
+                <th>สถานะ</th>
+            </tr>
+        </thead>
+        <tbody id="book-table-body">
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            loadBooks();
+
+            document.getElementById('addBookForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const newBookData = {
+                    isbn: document.getElementById('isbn').value,
+                    title: document.getElementById('title').value,
+                    author: document.getElementById('author').value,
+                    year: document.getElementById('year').value,
+                    publisher: document.getElementById('publisher').value
+                };
+
+                fetch('/api/book', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newBookData)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message || "บันทึกข้อมูลเรียบร้อย");
+                    document.getElementById('addBookForm').reset();
+                    loadBooks();
+                })
+                .catch(err => console.error('Error:', err));
+            });
+        });
+
+        function loadBooks() {
+            fetch('/api/books')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('book-table-body');
+                    tbody.innerHTML = ''; 
+                    
+                    data.forEach(book => {
+                        const row = `
+                            <tr>
+                                <td>${book.isbn}</td>
+                                <td>${book.title}</td>
+                                <td>${book.author}</td>
+                                <td>${book.year}</td>
+                                <td>${book.publisher}</td>
+                                <td class="status-available">${book.status}</td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += row;
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+
+</body>
+</html>
